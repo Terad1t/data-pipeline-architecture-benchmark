@@ -115,6 +115,16 @@ O projeto adota uma stack enxuta e adequada ao escopo de PIBIC:
 - **Docker**: empacotamento do ambiente experimental;
 - **Docker Compose**: orquestração mínima de serviços, quando útil.
 
+## Baseline Inicial
+A primeira implementação do projeto fixa o seguinte baseline:
+
+- **dataset inicial**: IMDb reviews;
+- **particionamento**: split estratificado treino/teste;
+- **pipeline**: TF-IDF + Logistic Regression;
+- **objetivo imediato**: estabelecer uma linha de base reprodutível para comparar com o futuro microbatch.
+
+Essa escolha é deliberada: o IMDb fornece um problema binário clássico, reduz ambiguidade de rótulos e permite concentrar a análise na arquitetura do pipeline, não na complexidade do corpus.
+
 ## Reprodutibilidade
 O uso de Docker não é apenas uma conveniência operacional; ele faz parte da metodologia experimental.
 

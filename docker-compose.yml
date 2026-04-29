@@ -1,0 +1,8 @@
+services:
+  batch-baseline:
+    build: .
+    image: pibic-sentiment-benchmark:latest
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: ["python", "-m", "pibic_sentiment.cli"]
