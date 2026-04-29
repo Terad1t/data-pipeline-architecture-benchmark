@@ -15,11 +15,12 @@ class DatasetConfig:
 class FeatureConfig:
     max_features: int = 20_000
     ngram_range: tuple[int, int] = (1, 2)
-    min_df: int = 2
+    min_df: int = 1
 
 
 @dataclass(frozen=True)
 class ModelConfig:
+    name: str = "logreg"
     max_iter: int = 1_000
     class_weight: str | None = "balanced"
     random_state: int = 42

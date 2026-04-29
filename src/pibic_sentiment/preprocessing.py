@@ -11,4 +11,4 @@ def normalize_text(text: str) -> str:
     text = text.replace("<br />", " ")
     text = text.translate(str.maketrans("", "", string.punctuation))
     text = _WHITESPACE_RE.sub(" ", text)
-    return text
+    return text.strip()

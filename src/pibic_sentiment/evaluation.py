@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from pathlib import Path
-from time import perf_counter
 
 import pandas as pd
 from sklearn.metrics import accuracy_score, classification_report, precision_recall_fscore_support
@@ -10,6 +10,9 @@ from sklearn.metrics import accuracy_score, classification_report, precision_rec
 
 @dataclass(frozen=True)
 class EvaluationResult:
+    model_name: str
+    dataset_name: str
+    run_id: str
     accuracy: float
     precision: float
     recall: float
@@ -19,11 +22,23 @@ class EvaluationResult:
     samples_per_second: float
 
 
-def evaluate_predictions(y_true, y_pred, *, elapsed_seconds: float, sample_count: int) -> EvaluationResult:
+def evaluate_predictions(
+    y_true,
+    y_pred,
+    *,
+    elapsed_seconds: float,
+    sample_count: int,
+    model_name: str,
+    dataset_name: str,
+    run_id: str,
+) -> EvaluationResult:
     precision, recall, f1, _ = precision_recall_fscore_support(y_true, y_pred, average="binary", zero_division=0)
     accuracy = accuracy_score(y_true, y_pred)
     throughput = sample_count / elapsed_seconds if elapsed_seconds > 0 else 0.0
     return EvaluationResult(
+        model_name=model_name,
+        dataset_name=dataset_name,
+        run_id=run_id,
         accuracy=accuracy,
         precision=precision,
         recall=recall,
