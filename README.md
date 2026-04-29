@@ -125,6 +125,87 @@ A primeira implementação do projeto fixa o seguinte baseline:
 
 Essa escolha é deliberada: o IMDb fornece um problema binário clássico, reduz ambiguidade de rótulos e permite concentrar a análise na arquitetura do pipeline, não na complexidade do corpus.
 
+## Anotações Operacionais
+Esta base foi desenhada para a Fase 1 do PIBIC, com foco em benchmark controlado e reprodutível.
+
+- O corpus inicial é o IMDb, obtido automaticamente na primeira execução.
+- O notebook de laboratório está em [notebooks/01_phase1_baseline_batch.ipynb](notebooks/01_phase1_baseline_batch.ipynb).
+- Os resultados consolidados do runner são gravados em `metrics/`.
+- Os artefatos de modelo e manifesto de execução são gravados em `experiments/runs/`.
+- A execução reprodutível usa `uv` da Astral, não um ambiente Python manual solto.
+- PyTorch, Hadoop e DataBricks ficam fora da Fase 1 por enquanto.
+- PostgreSQL não é obrigatório nesta etapa; se entrar depois, deve ser por justificativa clara de persistência/consulta experimental.
+
+## Como Rodar
+### Pré-requisitos
+- `uv` instalado.
+- Docker e Docker Compose instalados.
+
+### 1. Sincronizar o ambiente
+```bash
+uv sync
+```
+
+Esse comando cria e/ou atualiza a virtualenv do projeto com as dependências do `pyproject.toml`.
+
+### 2. Executar os testes mínimos
+```bash
+uv run python -m unittest discover -s tests -p "test_*.py"
+```
+
+Isso valida a normalização, o baseline batch e o runner experimental.
+
+### 3. Rodar o baseline batch individualmente
+```bash
+uv run run-batch-baseline
+```
+
+Opcionalmente, você pode ajustar parâmetros:
+
+```bash
+uv run run-batch-baseline --dataset imdb --test-size 0.2 --random-state 42 --output-dir metrics --artifacts-dir experiments/runs
+```
+
+### 4. Rodar o Sprint 1 completo do benchmark
+```bash
+uv run run-sprint1
+```
+
+Esse comando executa múltiplas seeds e os dois modelos da fase inicial: `logreg` e `linear_svm`.
+
+### 5. Abrir o notebook de laboratório
+Abra [notebooks/01_phase1_baseline_batch.ipynb](notebooks/01_phase1_baseline_batch.ipynb) no VS Code ou no Jupyter. O notebook importa os módulos do pacote e chama o baseline batch sem concentrar a lógica do experimento nele.
+
+### 6. Executar via Docker
+Build da imagem:
+
+```bash
+docker compose build
+```
+
+Executar o baseline no container:
+
+```bash
+docker compose run --rm batch-baseline
+```
+
+Se quiser substituir o comando padrão, você pode invocar diretamente o runner:
+
+```bash
+docker compose run --rm batch-baseline run-sprint1
+```
+
+### 7. Onde encontrar os artefatos
+- Métricas agregadas: `metrics/batch_baseline_metrics.csv` e `metrics/benchmark_summary.csv`.
+- Logs de execução: `metrics/batch_run_log.jsonl`.
+- Manifestos por execução: `experiments/runs/*.json`.
+- Modelos serializados: `experiments/runs/*.joblib`.
+
+## Observações de Uso
+- Na primeira execução, o IMDb pode ser baixado pela biblioteca `datasets`.
+- Se você quiser comparar resultados entre execuções, mantenha as seeds fixas.
+- O baseline batch foi desenhado para ser a referência científica do projeto; o microbatch virá depois como comparação arquitetural.
+
 ## Reprodutibilidade
 O uso de Docker não é apenas uma conveniência operacional; ele faz parte da metodologia experimental.
 
